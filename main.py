@@ -15,7 +15,7 @@ async def on_ready():
     logger.info(f'{bot.user} has connected to Discord!')
 
 
-@bot.command("compliment", pass_context=True)
+@bot.command("compliment")
 async def compliment(ctx):
     await givelove.invoke(ctx)
 
