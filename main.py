@@ -27,6 +27,7 @@ async def give_love(ctx):
 
 @bot.command("givelove")
 async def givelove(ctx):
+    logger.info(ctx.channel.members)
     url = "https://complimentr.com/api"
     headers = {
         'Accept': 'application/json'
@@ -78,6 +79,7 @@ async def roast(ctx):
 
 def main():
     logger.setLevel(logging.DEBUG)
+    logger.info(TOKEN)
     # logging.basicConfig(format='%(asctime)s - %(name)s - %(message)s', filename='')
     logging.getLogger('discord').setLevel(logging.DEBUG)
 
