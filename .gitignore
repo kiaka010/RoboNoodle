@@ -2,4 +2,4 @@ venv/
 .idea/
 *.txt
 .env-local
-*__pycache__*
+__pycache__/

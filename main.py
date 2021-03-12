@@ -42,7 +42,6 @@ async def idea(ctx):
     await ctx.message.add_reaction('\U0001f44d')
 
 
-
 @bot.command("compliment")
 async def compliment(ctx):
     await givelove.invoke(ctx)
@@ -55,14 +54,13 @@ async def give_love(ctx):
 
 @bot.command("givelove")
 async def givelove(ctx):
-    logger.info(ctx.channel.members)
+    # logger.info(ctx.channel.members)
     url = "https://complimentr.com/api"
     headers = {
         'Accept': 'application/json'
     }
 
     response = requests.request('GET', url, headers=headers)
-    logger.info(response)
 
     if response.status_code != 200:
         logger.error("A compliment Request Failed")
@@ -106,8 +104,10 @@ async def roast(ctx):
 
 
 def main():
+    # logging.basicConfig(level=logging.DEBUG)
+
     logger.setLevel(logging.DEBUG)
-    logger.info(TOKEN)
+    # logger.info(TOKEN)
     # logging.basicConfig(format='%(asctime)s - %(name)s - %(message)s', filename='')
     logging.getLogger('discord').setLevel(logging.DEBUG)
 
@@ -123,7 +123,8 @@ def main():
     rootLogger.addHandler(consoleHandler)
 
     logger.info("Starting")
-    logger.info(TOKEN)
+    
+    # logger.info(TOKEN)
     bot.run(TOKEN)
 
 if __name__ == "__main__":

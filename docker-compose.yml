@@ -7,3 +7,11 @@ services:
         container_name: "robo-noodle"
         volumes:
           - .:/opt/docroot
+        networks: 
+          - backend
+
+networks:
+    backend:
+        driver: bridge
+        driver_opts:
+            com.docker.network.driver.mtu: 1400
