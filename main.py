@@ -1,9 +1,11 @@
 import os
-
+import random
 import discord
 import requests
 from discord.ext import commands
 import logging
+import aiocron
+
 from src.plugins.compliment import *
 
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -16,6 +18,50 @@ async def on_ready():
     logger.info(f'{bot.user} has connected to Discord!')
 
 
+@bot.command("dankerbeef")
+async def dankerbeef(ctx):
+    url = "https://www.googleapis.com/youtube/v3/search"
+    params = {
+        'key': os.getenv('YOUTUBE_API_KEY'),
+        'channelId': 'UCsv2pj6rM1hM5YloMDZdGwA',
+        'order': "date",
+        'maxResults': 200
+    }
+    response = requests.request('GET', url, params=params)
+    # logger.info(response)
+
+    if response.status_code != 200:
+        logger.error("A compliment Request Failed")
+        await ctx.send("Sorry something went wrong. Please try again later.....or not")
+        return
+    video_list = []
+    video_list += response.json()['items']
+    # logger.info(video_list)
+    if 'nextPageToken' in response.json():
+        while 'nextPageToken' in response.json():
+            logger.info("Requesting next page %s" % response.json()['nextPageToken'])
+            params['pageToken'] = response.json()['nextPageToken']
+            response = requests.request('GET', url, params=params)
+            logger.info(response)
+
+            if response.status_code != 200:
+                logger.error("A compliment Request Failed")
+                await ctx.send("Sorry something went wrong. Please try again later.....or not")
+                return
+
+            video_list += response.json()['items']
+    # logger.info(video_list)
+    random_video = random.choice(video_list)
+    await ctx.send("Enjoy your daily Danker Beef vid")
+    await ctx.send("https://www.youtube.com/watch?v=%s" % random_video['id']['videoId'])
+
+
+# @aiocron.crontab('* * * * *')  # every min
+@aiocron.crontab('1 0 * * *')  # 1 min past midnight
+async def midnight_process():
+    channel = bot.get_channel(767694903035559942)
+    await dankerbeef(channel)
+#
 @bot.command("idea")
 async def idea(ctx):
     idea = ctx.message.clean_content.replace(PREFIX + "idea", "")

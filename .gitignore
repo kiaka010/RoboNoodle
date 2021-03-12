@@ -1,5 +1,5 @@
 venv/
 .idea/
-*.txt
+logs.txt
 .env-local
 __pycache__/
