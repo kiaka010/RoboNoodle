@@ -1,5 +1,6 @@
 import os
 
+import discord
 import requests
 from discord.ext import commands
 import logging
@@ -13,6 +14,33 @@ bot = commands.Bot(command_prefix=PREFIX)
 
 async def on_ready():
     logger.info(f'{bot.user} has connected to Discord!')
+
+
+@bot.command("idea")
+async def idea(ctx):
+    idea = ctx.message.clean_content.replace(PREFIX + "idea", "")
+
+    author_name = ctx.author.name
+    url = "https://api.trello.com/1/cards"
+    params = {
+        'key': os.getenv('TRELLO_API_KEY'),
+        'token': os.getenv('TRELLO_API_TOKEN'),
+        'idList': '604ab9e2028f1f3c06e42389',
+        'name': "(%s) %s" % (author_name, idea),
+    }
+    logger.info(params)
+    response = requests.request('POST', url, params=params)
+    logger.info(response)
+
+    if response.status_code != 200:
+        logger.error("A compliment Request Failed")
+        await ctx.send("Sorry something went wrong. Please try again later.....or not")
+        return
+
+    # thumbs up message
+
+    await ctx.message.add_reaction('\U0001f44d')
+
 
 
 @bot.command("compliment")
