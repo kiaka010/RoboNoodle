@@ -52,14 +52,15 @@ async def dankerbeef(ctx):
             video_list += response.json()['items']
     # logger.info(video_list)
     random_video = random.choice(video_list)
-    await ctx.send("Enjoy your daily Danker Beef vid")
     await ctx.send("https://www.youtube.com/watch?v=%s" % random_video['id']['videoId'])
 
 
 # @aiocron.crontab('* * * * *')  # every min
 @aiocron.crontab('1 0 * * *')  # 1 min past midnight
 async def midnight_process():
-    channel = bot.get_channel(767694903035559942)
+    channel = bot.get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
+    await channel.send("Enjoy your daily Danker Beef vid")
+
     await dankerbeef(channel)
 #
 @bot.command("idea")
