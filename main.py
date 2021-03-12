@@ -5,6 +5,9 @@ import requests
 from discord.ext import commands
 import logging
 import aiocron
+import requests_cache
+requests_cache.install_cache('system_cache', backend='sqlite', expire_after=1)
+
 
 from src.plugins.compliment import *
 
@@ -27,8 +30,9 @@ async def dankerbeef(ctx):
         'order': "date",
         'maxResults': 200
     }
-    response = requests.request('GET', url, params=params)
-    # logger.info(response)
+    response = requests.get(url, params=params, expire_after=3600)
+    logger.info("Is request cached: %s" % response.from_cache)
+    logger.info(response)
 
     if response.status_code != 200:
         logger.error("A compliment Request Failed")
@@ -41,7 +45,9 @@ async def dankerbeef(ctx):
         while 'nextPageToken' in response.json():
             logger.info("Requesting next page %s" % response.json()['nextPageToken'])
             params['pageToken'] = response.json()['nextPageToken']
-            response = requests.request('GET', url, params=params)
+            response = requests.get(url, params=params, expire_after=3600)
+            logger.info("Is request cached: %s" % response.from_cache)
+
             logger.info(response)
 
             if response.status_code != 200:
@@ -77,6 +83,8 @@ async def idea(ctx):
     }
     logger.info(params)
     response = requests.request('POST', url, params=params)
+    logger.info("Is request cached: %s" % response.from_cache)
+
     logger.info(response)
 
     if response.status_code != 200:
@@ -108,6 +116,7 @@ async def givelove(ctx):
     }
 
     response = requests.request('GET', url, headers=headers)
+    logger.info("Is request cached: %s" % response.from_cache)
 
     if response.status_code != 200:
         logger.error("A compliment Request Failed")
@@ -133,6 +142,7 @@ async def roast(ctx):
     }
 
     response = requests.request('GET', url, headers=headers)
+    logger.info("Is request cached: %s" % response.from_cache)
     logger.info(response)
 
     if response.status_code != 200:

@@ -3,3 +3,4 @@ python-dotenv
 coloredlogs
 requests
 aiocron
+git+git://github.com/reclosedev/requests-cache.git@master#egg=requests-cache
