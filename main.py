@@ -161,7 +161,7 @@ async def roast(ctx):
 
 
 @bot.command("dadjoke")
-async def roast(ctx):
+async def dadjoke(ctx):
 
     url = "https://icanhazdadjoke.com/"
     headers = {
