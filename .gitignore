@@ -3,5 +3,6 @@ venv/
 logs.txt
 .env-local*
 __pycache__/
+*.pyc
 test.py
 *.sqlite
