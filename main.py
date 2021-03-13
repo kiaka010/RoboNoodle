@@ -5,6 +5,8 @@ import requests
 from discord.ext import commands
 import logging
 import aiocron
+from bs4 import BeautifulSoup
+
 import requests_cache
 requests_cache.install_cache('system_cache', backend='sqlite', expire_after=1)
 
@@ -185,6 +187,34 @@ async def dadjoke(ctx):
     joke += response.json()['joke']
 
     await ctx.send(joke)
+
+@bot.command("pickup")
+async def pickup(ctx):
+
+    url = "http://www.pickuplinegen.com/"
+
+    response = requests.get(url)
+
+    response = requests.request('GET', url)
+    logger.info("Is request cached: %s" % response.from_cache)
+    logger.info(response)
+
+    if response.status_code != 200:
+        logger.error("A Pickup Line Request Failed")
+        await ctx.send("Sorry something went wrong. Please try again later.....or not")
+        return
+
+    pickup = ""
+    if ctx.message.mentions:
+        for mention in ctx.message.mentions:
+            logger.info(mention)
+            pickup += "<@%s> " % mention.id
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+    content = soup.select("#content")[0]
+    pickup += content.text
+
+    await ctx.send(pickup)
 
 
 def main():
