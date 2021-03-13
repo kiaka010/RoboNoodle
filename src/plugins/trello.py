@@ -4,7 +4,7 @@ from discord.ext import commands
 from src.utils.request import Request
 
 
-class Trello(AbstractPlugin, name='Ideas'):
+class Trello(AbstractPlugin, name='Report'):
 
     @commands.command("idea", help="Got an amazing idea for me, I WANT TO HEAR ALL ABOUT IT")
     async def idea(self, ctx):

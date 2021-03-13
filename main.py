@@ -6,17 +6,29 @@ import logging
 import aiocron
 from src.utils.request import Request
 from src.plugins import *
-
+from src.plugins.HelpCommandOverride import HelpCommandOverride
 
 TOKEN = os.getenv('DISCORD_TOKEN')
 PREFIX = os.getenv('DISCORD_PREFIX')
 logger = logging.getLogger("discord")
-bot = commands.Bot(command_prefix=PREFIX)
+bot = commands.Bot(command_prefix=PREFIX, case_insensitive=True, help_command=HelpCommandOverride())
 
 
 async def on_ready():
     logger.info(f'{bot.user} has connected to Discord!')
 
+
+####### All here are needed to create a custom regex setup of acting upon specific messages
+# @bot.event
+# async def on_message(msg):
+#     logger.info("in on_message #1")
+#     await bot.process_commands(msg)
+#
+# @bot.listen()
+# async def on_message(msg):
+#     logger.info("pebcak")
+#     await msg.add_reaction('\U0001f44d')
+#######
 
 @bot.command("dankerbeef", help="Looking for a Danker Beef video, look no further")
 async def dankerbeef(ctx):
@@ -59,7 +71,6 @@ async def midnight_process():
     await channel.send("Enjoy your daily Danker Beef vid")
 
     await dankerbeef(channel)
-
 
 def main():
     logger.setLevel(logging.DEBUG)
