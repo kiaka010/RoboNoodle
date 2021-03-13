@@ -160,6 +160,33 @@ async def roast(ctx):
     await ctx.send(insult)
 
 
+@bot.command("dadjoke")
+async def roast(ctx):
+
+    url = "https://icanhazdadjoke.com/"
+    headers = {
+        'Accept': 'application/json'
+    }
+
+    response = requests.request('GET', url, headers=headers)
+    logger.info("Is request cached: %s" % response.from_cache)
+    logger.info(response)
+
+    if response.status_code != 200:
+        logger.error("A Dad Joke Request Failed")
+        await ctx.send("Sorry something went wrong. Please try again later.....or not")
+        return
+
+    joke = ""
+    if ctx.message.mentions:
+        for mention in ctx.message.mentions:
+            logger.info(mention)
+            joke += "<@%s> " % mention.id
+    joke += response.json()['joke']
+
+    await ctx.send(joke)
+
+
 def main():
     # logging.basicConfig(level=logging.DEBUG)
 
