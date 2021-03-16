@@ -98,6 +98,7 @@ def install_cogs():
     bot.add_cog(Roast(bot, logger))
     bot.add_cog(Pickup(bot, logger))
     bot.add_cog(Trello(bot, logger))
+    bot.add_cog(Doggo(bot, logger))
     # bot.add_cog(DankerBeef(bot, logger))
 
 
