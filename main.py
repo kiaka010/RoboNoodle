@@ -72,16 +72,13 @@ async def midnight_process():
 
     await dankerbeef(channel)
 
+
 def main():
     logger.setLevel(logging.DEBUG)
     logging.getLogger('discord').setLevel(logging.DEBUG)
 
     logFormatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
     rootLogger = logging.getLogger()
-
-    fileHandler = logging.FileHandler(filename="logs.txt")
-    fileHandler.setFormatter(logFormatter)
-    rootLogger.addHandler(fileHandler)
 
     consoleHandler = logging.StreamHandler()
     consoleHandler.setFormatter(logFormatter)

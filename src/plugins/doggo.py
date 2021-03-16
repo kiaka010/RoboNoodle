@@ -20,6 +20,8 @@ class Doggo(AbstractPlugin):
 
     @commands.command("doggo", help="Feed your addiction of cute dogs")
     async def doggo(self, ctx, breed: str = None, sub_breed: str = None):
+        breed = breed.lower() if breed else None
+        sub_breed = sub_breed.lower() if sub_breed else None
         loggerr.info(self.dog_breeds)
         url = "https://dog.ceo/api/breeds/image/random"
         if breed and not sub_breed:
@@ -58,16 +60,27 @@ class Doggo(AbstractPlugin):
 
     @commands.command("doggo-breeds", help="Get a full list of all the dog breed images you could ever need")
     async def doggo_breeds(self, ctx):
-        await ctx.send("Here is a full list all the dog breeds you can ask for (not like you need more right?)")
 
+        message_group = []
         message = '```'
         for breed in self.dog_breeds:
-            if self.dog_breeds[breed] and len(self.dog_breeds[breed]) == 1:
-                message += f" {self.dog_breeds[breed][0]} {breed},"
-            elif self.dog_breeds[breed]:
+            if len(message) + len(breed) + 5 >= 2000:  # added two for space and comma - 2000 is discord message limit
+                message += '```'
+                message_group.append(message)
+                message = '```'
+
+            message += f" {breed},"
+            if self.dog_breeds[breed]:
                 for sub_breed in self.dog_breeds[breed]:
+                    if len(message) + len(breed) + len(sub_breed) + 6 >= 2000:  # added three for space and comma - 2000 is discord message limit
+                        message += '```'
+                        message_group.append(message)
+                        message = '```'
                     message += f" {sub_breed} {breed},"
-            else:
-                message += f" {breed},"
+
         message += '```'
-        await ctx.send(message)
+        message_group.append(message)
+        await ctx.send("Its quite a large list so let me just slide that into your DM's :wink:")
+
+        for out_message in message_group:
+            await ctx.author.send(out_message)
