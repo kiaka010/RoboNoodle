@@ -22,3 +22,5 @@ class Compliment(AbstractPlugin):
         compliment = MessageUtils.gather_mentions(ctx.message) + response.json()['compliment']
 
         await ctx.send(compliment)
+
+        return compliment

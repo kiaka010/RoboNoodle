@@ -25,3 +25,5 @@ class Pickup(AbstractPlugin):
         pickup += content.text.strip()
 
         await ctx.send(pickup)
+
+        return pickup

@@ -2,6 +2,9 @@ FROM python:3.7
 
 WORKDIR /opt/docroot
 
+RUN apt-get update
+RUN apt-get -y install ffmpeg
+
 COPY requirements.txt .
 
 RUN pip3 install -r requirements.txt

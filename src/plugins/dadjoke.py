@@ -21,3 +21,5 @@ class DadJoke(AbstractPlugin):
         joke = MessageUtils.gather_mentions(ctx.message) + response.json()['joke']
 
         await ctx.send(joke)
+
+        return joke

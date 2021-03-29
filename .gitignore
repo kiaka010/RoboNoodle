@@ -6,3 +6,6 @@ __pycache__/
 *.pyc
 test.py
 *.sqlite
+.coverage
+htmlcov/
+PERSONAL_NOTES.md

@@ -20,10 +20,10 @@ class Request:
 
         return response
 
-    def post(self, url, params=None, expire_after='default'):
+    def post(self, url, params=None, data=None, expire_after='default'):
         # @todo add some exception handling here
         logger.info("Making External GET Request %s" % url)
-        response = requests.request('POST', url, params=params, expire_after=expire_after)
+        response = requests.request('POST', url, params=params, data=data, expire_after=expire_after)
         logger.debug(response)
         logger.debug("Is request cached: %s" % response.from_cache)
         if response.status_code != 200:

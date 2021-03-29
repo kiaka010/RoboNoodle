@@ -22,3 +22,5 @@ class Roast(AbstractPlugin):
         insult = MessageUtils.gather_mentions(ctx.message) + response.json()['insult']
 
         await ctx.send(insult)
+
+        return insult
