@@ -26,6 +26,10 @@ class Voice(AbstractPlugin):
                 .removeprefix(str(ctx.command))\
                 # .replace('\n', ',')  # to add pauses on new lines
 
+        for mention in ctx.message.mentions:
+            # name = mention.member.nick if mention.member.nick else mention.username
+            message = message.replace('<@%s>' % mention.id, mention.display_name)
+
         self.logger.info(message)
         self.logger.info("past subcommand blocker")
 
