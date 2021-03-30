@@ -1,9 +1,11 @@
 import logging
+import random
 
 from .abstract_plugin import AbstractPlugin
 from discord.ext import commands
 import discord
 import ffmpeg
+import json
 import os
 from src.utils.request import Request
 from bs4 import BeautifulSoup
@@ -30,8 +32,7 @@ class Voice(AbstractPlugin):
             .replace(os.getenv('DISCORD_PREFIX') + "play", "")\
             .replace("@", "")
 
-
-    @commands.command(aliases=['speak', 'play'], help="Make me say something, or speak another command")
+    @commands.command(aliases=['speak'], help="Make me say something, or speak another command")
     async def say(self, ctx, *, message):
 
         if not ctx.author.voice:
@@ -41,11 +42,22 @@ class Voice(AbstractPlugin):
 
         new_message = await self._get_message(ctx, message)
 
-        # Female
-        # url = 'https://readloud.net/english/american/2-girl-s-voice-sally.html'
-        
-        # Male 
-        url = 'https://readloud.net/english/australian/48-male-voice-russell.html'
+        voice_type = None
+
+        with open('src/data/voice_details.json', 'r') as f:
+            voice_details = json.load(f)
+            guild_id = str(ctx.guild.id)
+            author_id = str(ctx.author.id)
+            if guild_id in voice_details['data'] and author_id in voice_details['data'][guild_id]:
+                voice_type = voice_details['data'][guild_id][author_id]
+            # f.close()
+
+        if voice_type and voice_type in voice_details['options']:
+            url = voice_details['options'][voice_type]
+        else:
+            url = voice_details['options'][random.choice(list(voice_details['options']))]
+
+        self.logger.info(url)
 
         data = {
             'but': "submit",
@@ -59,8 +71,7 @@ class Voice(AbstractPlugin):
 
         soup = BeautifulSoup(response.text, 'html.parser')
         content = soup.findAll("source")
-        # self.logger.info(content[0]['src'])
-        # self.logger.info(content)
+
         if not content:
             self.logger.info("Content Not found")
             return
@@ -77,7 +88,6 @@ class Voice(AbstractPlugin):
 
         audio_source = discord.FFmpegPCMAudio('https://readloud.net' + audio_path, options='-filter:a "atempo=0.85"')
 
-
         # maybe better join example
         if voice_client and voice_client.is_connected():
             await voice_client.move_to(channel)
@@ -89,7 +99,56 @@ class Voice(AbstractPlugin):
 
         await ctx.message.add_reaction('\U0001f44d')
 
-    @commands.command()
+    @commands.group(pass_context=True, help="Commands to control me in voice - including what voice you want me to use")
+    async def vc(self, ctx):
+        if ctx.invoked_subcommand:
+            self.logger.info("inside ferdo love - Sub Command Called")
+            return
+
+    @vc.group(name="set-voice", pass_context=True,
+              brief="- pass one of the options (m or f (for now)) to choose what voice i use for you",
+              description="Pass one of the options (m or f (for now)) to choose what voice i use for you"
+              )
+    async def set_voice(self, ctx, voice_type):
+        self.logger.info("im being asked to set Guild: %s Author: %s: VoiceType: %s" %
+             (
+                ctx.guild.id,
+                ctx.author.id,
+                voice_type
+             )
+         )
+
+        with open('src/data/voice_details.json', 'r') as f:
+            voice_details = json.load(f)
+            if voice_type not in voice_details['options']:
+                await ctx.send("Sorry only the following options are allowed %s" %
+                               ', '.join(voice_details['options'].keys())
+                               )
+                return
+            guild_id = str(ctx.guild.id)
+            author_id = str(ctx.author.id)
+
+            if guild_id not in voice_details['data']:
+                voice_details['data'][guild_id] = {}
+            voice_details['data'][guild_id][author_id] = voice_type
+            f.close()
+        with open('src/data/voice_details.json', 'w') as f:
+            json.dump(voice_details, f, indent=4)
+            f.close()
+            await ctx.message.add_reaction('\U0001f44d')
+
+
+    # @vc.group(pass_context=True)
+    # async def leave(self, ctx):
+    # @todo: current does not work, no option disconect avalable under voice channel
+    #
+    #     channel = ctx.author.voice.channel
+    #     await channel.disconect()
+
+    @vc.group(pass_context=True,
+              brief="- Join a voice channel",
+              description="Join a voice channel"
+              )
     async def join(self, ctx):
         channel = ctx.author.voice.channel
         await channel.connect()
