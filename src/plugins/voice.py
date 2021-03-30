@@ -41,7 +41,11 @@ class Voice(AbstractPlugin):
 
         new_message = await self._get_message(ctx, message)
 
-        url = 'https://readloud.net/english/american/2-girl-s-voice-sally.html'
+        # Female
+        # url = 'https://readloud.net/english/american/2-girl-s-voice-sally.html'
+        
+        # Male 
+        url = 'https://readloud.net/english/australian/48-male-voice-russell.html'
 
         data = {
             'but': "submit",
