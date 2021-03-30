@@ -1,7 +1,5 @@
-import logging
-import random
-
 from .abstract_plugin import AbstractPlugin
+import random
 from discord.ext import commands
 import discord
 import ffmpeg
@@ -12,35 +10,29 @@ from bs4 import BeautifulSoup
 
 class Voice(AbstractPlugin):
 
-    async def _get_message(self, ctx, message):
-        self.logger.info(message[:1])
-        self.logger.info(message[1:])
-        if os.getenv('DISCORD_PREFIX') == message[:1]:
-            if " " in message[1:]:
-                command, query = message[1:].split(" ", 1)
-            else:
-                command = message[1:]
+    @commands.group(pass_context=True, aliases=['speak'], help="Make me say something, or speak another command")
+    async def say(self, ctx):
+        self.logger.info(ctx.invoked_subcommand)
+        self.logger.info(ctx.message.content)
+        self.logger.info(ctx.command)
+        self.logger.info(ctx.prefix)
+        if ctx.invoked_subcommand:
+            self.logger.info("inside say - Sub Command Called")
+            return
+        else:
+            message = str(ctx.message.content)\
+                .lower()\
+                .removeprefix(str(ctx.prefix))\
+                .removeprefix(str(ctx.command))\
+                # .replace('\n', ',')  # to add pauses on new lines
 
-            self.logger.info('Found cascade command')
-            response = await ctx.invoke(self.bot.get_command(command))
-            self.logger.info(response)
-            if response:
-                return response
-
-        return ctx.message.clean_content.replace(os.getenv('DISCORD_PREFIX') + "say", "")\
-            .replace(os.getenv('DISCORD_PREFIX') + "speak", "")\
-            .replace(os.getenv('DISCORD_PREFIX') + "play", "")\
-            .replace("@", "")
-
-    @commands.command(aliases=['speak'], help="Make me say something, or speak another command")
-    async def say(self, ctx, *, message):
+        self.logger.info(message)
+        self.logger.info("past subcommand blocker")
 
         if not ctx.author.voice:
             await ctx.send("You need to be in a voice channel for this to work")
             return
         channel = ctx.author.voice.channel
-
-        new_message = await self._get_message(ctx, message)
 
         voice_type = None
 
@@ -50,7 +42,6 @@ class Voice(AbstractPlugin):
             author_id = str(ctx.author.id)
             if guild_id in voice_details['data'] and author_id in voice_details['data'][guild_id]:
                 voice_type = voice_details['data'][guild_id][author_id]
-            # f.close()
 
         if voice_type and voice_type in voice_details['options']:
             url = voice_details['options'][voice_type]
@@ -61,7 +52,7 @@ class Voice(AbstractPlugin):
 
         data = {
             'but': "submit",
-            'but1': new_message
+            'but1': message
         }
 
         response = Request().post(url, data=data, expire_after=1800)
@@ -98,6 +89,34 @@ class Voice(AbstractPlugin):
             voice_client.play(audio_source, after=None)
 
         await ctx.message.add_reaction('\U0001f44d')
+
+    @say.group(pass_context=True, name=os.getenv('DISCORD_PREFIX') + "dadjoke", brief="- Dad Jokes ftw")
+    async def dadjoke_sub(self, ctx):
+        response = await ctx.invoke(self.bot.get_command('dadjoke'))
+        ctx.message.content = response
+        ctx.invoked_subcommand = None
+        await self.say(ctx)
+
+    @say.group(pass_context=True, name=os.getenv('DISCORD_PREFIX') + "roast", brief="- Abuse incomming")
+    async def roast_sub(self, ctx):
+        response = await ctx.invoke(self.bot.get_command('roast'))
+        ctx.message.content = response
+        ctx.invoked_subcommand = None
+        await self.say(ctx)
+
+    @say.group(pass_context=True, name=os.getenv('DISCORD_PREFIX') + "pickup", brief="- Best pickup lines")
+    async def pickup_sub(self, ctx):
+        response = await ctx.invoke(self.bot.get_command('pickup'))
+        ctx.message.content = response
+        ctx.invoked_subcommand = None
+        await self.say(ctx)
+
+    @say.group(pass_context=True, name=os.getenv('DISCORD_PREFIX') + "givelove", brief="- A little bit of love")
+    async def givelove_sub(self, ctx):
+        response = await ctx.invoke(self.bot.get_command('givelove'))
+        ctx.message.content = response
+        ctx.invoked_subcommand = None
+        await self.say(ctx)
 
     @commands.group(pass_context=True, help="Commands to control me in voice - including what voice you want me to use")
     async def vc(self, ctx):
