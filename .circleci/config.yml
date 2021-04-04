@@ -1,7 +1,8 @@
 version: 2.1
 jobs:
   build-image:
-    machine: true
+    docker:
+      - image: circleci/buildpack-deps:stretch-scm
     steps:
       - checkout
       - setup_remote_docker
