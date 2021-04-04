@@ -1,14 +1,18 @@
 version: 2.1
 jobs:
-  check-and-build-only:
-    executor: docker/machine
+  build-image:
+    machine: true
     steps:
       - checkout
-      - docker/check
-      - docker/build
-orbs:
-  docker: circleci/docker@1.5.0
+      - setup_remote_docker
+      - run: docker build -t kiaka010/robo-noodle:$CIRCLE_BRANCH .
+  unittest:
+    machine: true
+    steps:
+      - run: docker run --rm kiaka010/robo-noodle:$CIRCLE_BRANCH python -m unittest discover test/utils/
+
 workflows:
-  build-docker-image-only:
+  build-deploy:
     jobs:
-      - check-and-build-only
+      - build-image
+      - unittest
