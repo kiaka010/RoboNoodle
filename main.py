@@ -57,10 +57,8 @@ async def dankerbeef(ctx):
             if not response:
                 await ctx.send("Sorry something went wrong. Please try again later.....or not")
                 return
-            # if response.json()['items']:
-            #     video_list += response.json()['items']
-
-            video_list += response.json()['items']
+            if response.json()['items']:
+                video_list += response.json()['items']
 
     random_video = random.choice(video_list)
     await ctx.send("https://www.youtube.com/watch?v=%s" % random_video['id']['videoId'])
@@ -75,7 +73,7 @@ async def midnight_process():
     await dankerbeef(channel)
 
 
-@aiocron.crontab('0 21 * * *')  # 0 min past 9pm
+@aiocron.crontab('0 19 * * *')  # 0 min past 7pm
 async def kuu_appreciation():
     channel = bot.get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
     await channel.send("<@461055013582798859> This is your daily reminder that you're a very good girl")
