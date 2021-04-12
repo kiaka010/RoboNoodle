@@ -9,5 +9,6 @@ class HelpCommandOverride(DefaultHelpCommand):
         super().__init__(**options)
         logger.info(options)
         self.command_attrs['name'] = 'robohelp'
+        self.command_attrs['aliases'] = ['help']
         self.no_category = "Default"
         self.width = 100
