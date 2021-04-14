@@ -67,7 +67,7 @@ async def dankerbeef(ctx):
 # @aiocron.crontab('* * * * *')  # every min
 @aiocron.crontab('1 0 * * *')  # 1 min past midnight
 async def midnight_process():
-    channel = bot.get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
+    channel = bot.get_guild(696361030602719253).get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
     await channel.send("Enjoy your daily Danker Beef vid")
 
     await dankerbeef(channel)
@@ -75,7 +75,7 @@ async def midnight_process():
 
 @aiocron.crontab('0 19 * * *')  # 0 min past 7pm
 async def kuu_appreciation():
-    channel = bot.get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
+    channel = bot.get_guild(696361030602719253).get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
     await channel.send("<@461055013582798859> This is your daily reminder that you're a very good girl")
 
 

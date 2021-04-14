@@ -10,6 +10,8 @@ from bs4 import BeautifulSoup
 
 class Voice(AbstractPlugin):
 
+    discord_prefix = os.getenv('DISCORD_PREFIX') if os.getenv('DISCORD_PREFIX') else ""
+
     @commands.group(pass_context=True, aliases=['speak'], help="Make me say something, or speak another command")
     async def say(self, ctx):
         self.logger.info(ctx.invoked_subcommand)
@@ -24,11 +26,12 @@ class Voice(AbstractPlugin):
                 .lower()\
                 .removeprefix(str(ctx.prefix))\
                 .removeprefix(str(ctx.command))\
-                # .replace('\n', ',')  # to add pauses on new lines
+                .replace('\n', ', ')  # to add pauses on new lines
 
         for mention in ctx.message.mentions:
-            # name = mention.member.nick if mention.member.nick else mention.username
-            message = message.replace('<@%s>' % mention.id, mention.display_name)
+            self.logger.info(mention.display_name)
+            message = message.replace('<@%s>' % mention.id, '%s, ' % mention.display_name)
+            message = message.replace('<@!%s>' % mention.id, '%s, ' % mention.display_name)  # ! indicated nickname used
 
         self.logger.info(message)
         self.logger.info("past subcommand blocker")
@@ -94,28 +97,28 @@ class Voice(AbstractPlugin):
 
         await ctx.message.add_reaction('\U0001f44d')
 
-    @say.group(pass_context=True, name=os.getenv('DISCORD_PREFIX') + "dadjoke", brief="- Dad Jokes ftw")
+    @say.group(pass_context=True, name=discord_prefix + "dadjoke", brief="- Dad Jokes ftw")
     async def dadjoke_sub(self, ctx):
         response = await ctx.invoke(self.bot.get_command('dadjoke'))
         ctx.message.content = response
         ctx.invoked_subcommand = None
         await self.say(ctx)
 
-    @say.group(pass_context=True, name=os.getenv('DISCORD_PREFIX') + "roast", brief="- Abuse incomming")
+    @say.group(pass_context=True, name=discord_prefix + "roast", brief="- Abuse incomming")
     async def roast_sub(self, ctx):
         response = await ctx.invoke(self.bot.get_command('roast'))
         ctx.message.content = response
         ctx.invoked_subcommand = None
         await self.say(ctx)
 
-    @say.group(pass_context=True, name=os.getenv('DISCORD_PREFIX') + "pickup", brief="- Best pickup lines")
+    @say.group(pass_context=True, name=discord_prefix + "pickup", brief="- Best pickup lines")
     async def pickup_sub(self, ctx):
         response = await ctx.invoke(self.bot.get_command('pickup'))
         ctx.message.content = response
         ctx.invoked_subcommand = None
         await self.say(ctx)
 
-    @say.group(pass_context=True, name=os.getenv('DISCORD_PREFIX') + "givelove", brief="- A little bit of love")
+    @say.group(pass_context=True, name=discord_prefix + "givelove", brief="- A little bit of love")
     async def givelove_sub(self, ctx):
         response = await ctx.invoke(self.bot.get_command('givelove'))
         ctx.message.content = response
@@ -125,7 +128,7 @@ class Voice(AbstractPlugin):
     @commands.group(pass_context=True, help="Commands to control me in voice - including what voice you want me to use")
     async def vc(self, ctx):
         if ctx.invoked_subcommand:
-            self.logger.info("inside ferdo love - Sub Command Called")
+            self.logger.info("inside voice - Sub Command Called")
             return
 
     @vc.group(name="set-voice", pass_context=True,
@@ -175,3 +178,15 @@ class Voice(AbstractPlugin):
     async def join(self, ctx):
         channel = ctx.author.voice.channel
         await channel.connect()
+
+    @vc.group(pass_context=True,
+              brief="- Stop me Speaking",
+              description="Stop me Speaking"
+              )
+    async def stop(self, ctx):
+
+        voice_client: discord.VoiceClient = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
+
+        if voice_client and voice_client.is_playing():
+            voice_client.stop()
+            await ctx.message.add_reaction('\U0001f44d')
