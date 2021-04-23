@@ -78,6 +78,11 @@ async def kuu_appreciation():
     channel = bot.get_guild(696361030602719253).get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
     await channel.send("<@461055013582798859> This is your daily reminder that you're a very good girl")
 
+@aiocron.crontab('0 21 * * *')  # 0 min past 9pm
+async def bean_monkey():
+    channel = bot.get_guild(696361030602719253).get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
+    await channel.send("Hey everyone! I'm here to remind you to flick that bean / spank that monkey ..... who am i kidding.  \nYou probably did that the moment you woke up this morning, you naughty noodle")
+
 
 def main():
     logger.setLevel(logging.DEBUG)
