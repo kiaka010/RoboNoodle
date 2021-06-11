@@ -30,19 +30,18 @@ async def on_ready():
 #     await msg.add_reaction('\U0001f44d')
 #######
 
-@bot.command("dankerbeef", help="Looking for a Danker Beef video, look no further")
-async def dankerbeef(ctx):
+def youtube_fetch_random(channel_id):
     url = "https://www.googleapis.com/youtube/v3/search"
     params = {
         'key': os.getenv('YOUTUBE_API_KEY'),
-        'channelId': 'UCsv2pj6rM1hM5YloMDZdGwA',
+        'channelId': channel_id,
         'order': "date",
+        'type': 'video',
         'maxResults': 200
     }
     response = Request().get(url, params=params, expire_after=3600)
 
     if not response:
-        await ctx.send("Sorry something went wrong. Please try again later.....or not")
         return
 
     video_list = []
@@ -55,22 +54,38 @@ async def dankerbeef(ctx):
             response = Request().get(url, params=params, expire_after=3600)
 
             if not response:
-                await ctx.send("Sorry something went wrong. Please try again later.....or not")
                 return
             if response.json()['items']:
                 video_list += response.json()['items']
 
     random_video = random.choice(video_list)
-    await ctx.send("https://www.youtube.com/watch?v=%s" % random_video['id']['videoId'])
+    return random_video
 
+@bot.command("dankerbeef", help="Looking for a Danker Beef video, look no further")
+async def dankerbeef(ctx):
+    video = youtube_fetch_random('UCsv2pj6rM1hM5YloMDZdGwA')
+    if not video:
+        await ctx.send("Sorry something went wrong. Please try again later.....or not")
+        return
+
+    await ctx.send("https://www.youtube.com/watch?v=%s" % video['id']['videoId'])
+
+@bot.command("daily-internet", help="Looking for a little piece of the internet?")
+async def daily_internet(ctx):
+    video = youtube_fetch_random('UCdC0An4ZPNr_YiFiYoVbwaw')
+    if not video:
+        await ctx.send("Sorry something went wrong. Please try again later.....or not")
+        return
+
+    await ctx.send("https://www.youtube.com/watch?v=%s" % video['id']['videoId'])
 
 # @aiocron.crontab('* * * * *')  # every min
 @aiocron.crontab('1 0 * * *')  # 1 min past midnight
 async def midnight_process():
     channel = bot.get_guild(696361030602719253).get_channel(int(os.getenv('GENERAL_CHANNEL_ID')))
-    await channel.send("Enjoy your daily Danker Beef vid")
+    await channel.send("Enjoy your Daily Dose of the Internet")
 
-    await dankerbeef(channel)
+    await daily_internet(channel)
 
 
 @aiocron.crontab('0 19 * * *')  # 0 min past 7pm
