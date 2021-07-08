@@ -1,0 +1,19 @@
+version: 2.1
+jobs:
+  build-image:
+    docker:
+      - image: circleci/buildpack-deps:stretch-scm
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: docker build -t kiaka010/robo-noodle:$CIRCLE_BRANCH .
+  unittest:
+    machine: true
+    steps:
+      - run: docker run --rm kiaka010/robo-noodle:$CIRCLE_BRANCH python -m unittest discover test/utils/
+
+workflows:
+  build-deploy:
+    jobs:
+      - build-image
+      - unittest
