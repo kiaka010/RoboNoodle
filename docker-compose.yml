@@ -7,8 +7,9 @@ services:
         container_name: "robo-noodle"
         volumes:
           - .:/opt/docroot
-        networks: 
+        networks:
           - backend
+        restart: always
 
 networks:
     backend:
